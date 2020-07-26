@@ -14,18 +14,30 @@ Amplify.addPluggable(new AWSIoTProvider({
   aws_pubsub_region: process.env.REACT_APP_REGION,
   aws_pubsub_endpoint: `wss://${process.env.REACT_APP_MQTT_ID}.iot.${process.env.REACT_APP_REGION}.amazonaws.com/mqtt`,
 }));
-Amplify.PubSub.subscribe('silvia-topic').subscribe({
-  next: data => console.log('Message received', data),
-  error: error => console.error(error),
-  close: () => console.log('Done'),
-});
+
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      msg: "",
+    };
+
+    // Subscribe to MQTT topic
+    Amplify.PubSub.subscribe('silvia-topic').subscribe({
+      next: data => {this.setState({msg: data.value.message}) ; console.log('Message received', data.value.message)},
+      error: error => console.error(error),
+      close: () => console.log('Done'),
+    });
+  }
+
   render() {
-    console.log(process.env)
+    //console.log(process.env)
+
     return (
       <div className="App">
         <h1>Rancilio Silvia Console</h1>
         <p>Check the console..</p>
+        <p>{"msg " + this.state.msg}</p>
       </div>
     );
   }
