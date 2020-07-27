@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import './App.css';
 import Amplify, { PubSub } from 'aws-amplify';
 import { AWSIoTProvider } from '@aws-amplify/pubsub/lib/Providers';
+import SeriesPlot from './SeriesPlot';
+
+const tempHistoryLength = 50;
+
 Amplify.configure({
   Auth: {
     identityPoolId: process.env.REACT_APP_IDENTITY_POOL_ID,
@@ -19,12 +23,19 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      msg: "",
+      messages: [],
     };
 
     // Subscribe to MQTT topic
     Amplify.PubSub.subscribe('silvia-topic').subscribe({
-      next: data => {this.setState({msg: data.value.message}) ; console.log('Message received', data.value.message)},
+      next: data => {
+        var currentMessages = [...this.state.messages, data.value.message];
+        if (this.state.messages.length >= tempHistoryLength) {
+          currentMessages.shift()
+        }
+        this.setState({messages: currentMessages});
+        console.log('Message received', data.value.message);
+      },
       error: error => console.error(error),
       close: () => console.log('Done'),
     });
@@ -36,8 +47,7 @@ class App extends Component {
     return (
       <div className="App">
         <h1>Rancilio Silvia Console</h1>
-        <p>Check the console..</p>
-        <p>{"msg " + this.state.msg}</p>
+        <SeriesPlot data={this.state.messages} />
       </div>
     );
   }

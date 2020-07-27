@@ -6,7 +6,8 @@
     "aws-amplify": "^2.2.5",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
-    "react-scripts": "0.9.5"
+    "react-scripts": "0.9.5",
+    "react-vis": "^1.11.7"
   },
   "devDependencies": {},
   "scripts": {
